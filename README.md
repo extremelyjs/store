@@ -11,7 +11,7 @@
 
 ```bash
 
-npm install @apiknight/store --save
+npm install @extremelyjs/store --save
 ·
 ```
 
@@ -26,7 +26,7 @@ npm install @apiknight/store --save
 
 ```tsx
 // 创建num.ts这个store
-import { createMapperHooksStore } from '@apiknight/store'
+import { createMapperHooksStore } from '@extremelyjs/store'
 
 const numStore = createMapperHooksStore<number>(0)
 
@@ -80,7 +80,7 @@ export const resetNum = numStore.reset // 重置state
 
 对于异步更新，可以使用异步更新能力。
 ```tsx
-  import { createMapperHooksStore } from "@apiknight/store";
+  import { createMapperHooksStore } from "@extremelyjs/store";
   import fetchCurrentPageContent from "../api/fetchCurrentPageContent";
   import { PageDataParams } from "../type/params";
 
@@ -104,7 +104,7 @@ export const resetNum = numStore.reset // 重置state
 
 ```tsx
 
-import { createMapperHooksStore } from "@apiknight/store/lib/index";
+import { createMapperHooksStore } from "@extremelyjs/store";
 import fetchCurrentPageContent from "../api/fetchCurrentPageContent";
 import { PageDataParams } from "../type/params";
 
