@@ -3,30 +3,38 @@ import { Action, Func, HooksStoreType, Options } from "./type"
 import { createStore, useSelector } from "./core"
 
 const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options?: Options): HooksStoreType<Result,T> => {
-
     const store = createStore(e => e,options)
+    const strategy = options?.strategy ?? 'acceptSequenced';
     let hasLocalStorage = false;
+
     if (typeof localStorage !== 'undefined') {
         hasLocalStorage = true;
     }
+
     else if (options?.withLocalStorage != null) {
         throw new Error("当前环境不支持loaclStorage");
     }
+
     if (hasLocalStorage) {
         if (initValue != null && localStorage.getItem(options?.withLocalStorage as string) == null) {
-            setStoreValue(initValue)
+            setStoreValue(initValue);
         }
+
         else {
-            setStoreValue(store.getState())
+            setStoreValue(initValue);
         }
+
     }
+
     else {
         setStoreValue(initValue);
     }
+
     function useStoreValue() {
         const storeValue = useSelector(store,state => state)
         return storeValue
     }
+
     function setStoreValue(value: Result | undefined): void
     function setStoreValue(func: Func<Result>): void
     function setStoreValue(value: Result | Func<Result> | undefined) {
@@ -58,10 +66,12 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
                 queueMicrotask(() => {
                     store.setIsDispatching(true);
                 });
+
                 func(params(data)).then((value) => {
                     store.setIsDispatching(false)
                     setStoreValue(value)
                 })
+
             }
             catch (error: any) {
                 throw new Error(error)
@@ -70,6 +80,7 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
                 store.setIsDispatching(false)
             }
         }
+
         return _loadStoreValue
     }
 
@@ -80,6 +91,7 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
 
     function useStoreLoading() {
         const [loading, setLoading] = useState(store.getIsDispatching());
+
         useEffect(() => {
             const callback = () => {
                 setLoading(store.getIsDispatching());
@@ -90,6 +102,7 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
                 store.unSubscribe(id)
             };
         }, [store]);
+
         return loading;
     }
 
@@ -97,10 +110,44 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
         return store.getIsDispatching()
     }
 
+    async function load(promiseQueue: Promise<Result>[]) {
+        if (strategy === 'acceptEvery') {
+             const result = await Promise.all(promiseQueue);
+             result?.map((item) => {
+                 setStoreValue(item);
+             })
+        }
+
+        else if (strategy === "acceptFirst") {
+            const result = await Promise.race(promiseQueue);
+            setStoreValue(result);
+        }
+
+        else if (strategy === "acceptLatest") {
+            const result = await Promise.allSettled(promiseQueue);
+            const lastResult = result.pop();
+            if (lastResult?.status === 'fulfilled') {
+                setStoreValue(lastResult.value);
+            }
+            else {
+                throw new Error('最后一个收到的结果为rejected');
+            }
+        }
+
+        else {
+            promiseQueue.forEach((item,index) => {
+                item.then((value) => {
+                    setStoreValue(value);
+                })
+                promiseQueue.slice(index + 1);
+            });
+        }
+    }
 
     function reset() {
         setStoreValue(initValue)
     }
+
     return {
         useStoreValue,
         setStoreValue,
@@ -108,7 +155,8 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
         getStoreValue,
         useStoreLoading,
         getStoreLoading,
-        reset
+        reset,
+        load
     }
 }
 

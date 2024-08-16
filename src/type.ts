@@ -22,8 +22,12 @@ export interface HooksStoreType<T = any,Params = any> {
     useStoreLoading: () => boolean;
     getStoreLoading: () => boolean;
     reset: () => void;
+    load: (params: Promise<T>[]) => Promise<void>;
 }
+
+type Strategy = "acceptFirst" | "acceptLatest" | "acceptEvery" | "acceptSequenced";
 
 export interface Options {
     withLocalStorage?: string;
+    strategy?: Strategy
 }

@@ -27,21 +27,27 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
         : null;
     
     let state: T | undefined = void 0;
+
     if (loaclStr != null) {
         let data = void 0;
         if (loaclStr?.startsWith("{")) {
             data = JSON.parse(loaclStr?.split("}:")[0]+ "}");
         }
+
         else if (loaclStr?.startsWith("[")) {
             data = JSON.parse(loaclStr?.split("]:")[0]+ "]");
         }
+
         else {
             data = getChangeType(loaclStr?.split(":")[1], loaclStr?.split(":")[0]);
         }
+
         state = data;
     }
+
     let listeners: Map<Symbol,Func> = new Map();
     let isDispatching = false;
+
     function subscribe(id: Symbol,callback: Func) {
         if (isDispatching) {
             throw new Error("Reducer此时不得派发动作。");
@@ -53,6 +59,7 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
         if (isDispatching) {
             throw new Error("Reducer此时不得派发动作。");
         }
+
         listeners.delete(id);
     }
 
@@ -60,19 +67,24 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
         if (isDispatching) {
             throw new Error("Reducers may not dispatch actions.");
         }
+
         try {
             isDispatching = true;
             state = reducer(state, action);
+
             if (options != null && options?.withLocalStorage !== "") {
                 localStorage.setItem(options?.withLocalStorage as string, JSON.stringify(state) + `:${typeof state}`);
             }
         }
+
         catch (error) {
             throw error;
         }
+
         finally {
             isDispatching = false;
         }
+
         listeners?.forEach((listener) => {
             listener();
         });
@@ -82,24 +94,31 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
         if (isDispatching) {
             throw new Error("Reducers may not dispatch actions.");
         }
+
         try {
             if (typeof state === "function") {
                 state = (value as Func)();
             }
+
             else {
                 state = reducer(value);
             }
+
             if (options != null && options?.withLocalStorage !== "") {
                 localStorage.setItem(options?.withLocalStorage as string, JSON.stringify(state) + `:${typeof state}`);
             }
+
             isDispatching = true;
         }
+
         catch (error) {
             throw error;
         }
+
         finally {
             isDispatching = false;
         }
+
         listeners?.forEach((listener) => {
             listener();
         });
@@ -109,19 +128,25 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
         if (isDispatching) {
             throw new Error("Reducers may not dispatch actions.");
         }
+
         try {
             state = newReducer(state);
             isDispatching = true;
+
             if (options != null && options?.withLocalStorage !== "") {
                 localStorage.setItem(options?.withLocalStorage as string, JSON.stringify(state) + `:${typeof state}`);
             }
+
         }
+
         catch (error) {
             throw error;
         }
+
         finally {
             isDispatching = false;
         }
+
         listeners?.forEach((listener) => {
             listener();
         });
@@ -131,13 +156,16 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
         if (isDispatching) {
             throw new Error("Reducer此时不得派发动作。");
         }
+
         return state;
     }
 
     function getIsDispatching() {
         return loading;
     }
+
     let loading = isDispatching;
+
     function setIsDispatching(dispatchState: boolean) {
         loading = reducer(dispatchState);
         listeners?.forEach((listener) => {
@@ -162,6 +190,7 @@ function createStore<T = any>(reducer: Func,options?: Options): StoreType<T> {
 
 const useSelector = (store: StoreType, selector: Func) => {
     const [selectedState, setSelectedState] = useState(() => selector(store.getState()));
+    
     useEffect(() => {
         const id = Symbol();
         const callback = () => {

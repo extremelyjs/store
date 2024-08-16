@@ -1,5 +1,7 @@
 # 一种全新的store库
 
+**之前叫@apiknight/store，现已更名**
+
 重新了Redux核心，同时提供了大量React hooks，以一种新思路来管理状态，不再需要维护type和reducer，可以实现类似useState,setState式的使用方式。
 同时具备了异步更新能力和持久化存储能力，同时采用ts开发，具备了完善的类型提示。
 
