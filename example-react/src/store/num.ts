@@ -1,4 +1,4 @@
-import { createMapperHooksStore } from "@apiknight/store";
+import { createMapperHooksStore } from "@extremelyjs/store/src/index";
 
 const numStore = createMapperHooksStore<number>(0);
 
