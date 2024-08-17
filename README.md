@@ -102,7 +102,11 @@ export const resetNum = numStore.reset // 重置state
 
 #### loading订阅
 
-对于异步更新，可以使用loading订阅。
+对于异步请求更新，可以使用loading订阅。
+
+我们可以写一个纯粹的请求函数，然后使用loadStoreValue来自动更新状态，后续的更新会在内部完成。
+
+同时我们也可以订阅他的loading态，无需额外的代码。
 
 ```tsx
 
@@ -115,7 +119,6 @@ export interface PageData {
     title: string;
     content: string;
 }
-
 
 const pageDataStore = createMapperHooksStore<string,PageDataParams>('', { withLocalStorage: 'page-data-new' });
 
@@ -132,6 +135,52 @@ export const loadPageData = pageDataStore.loadStoreValue(
 const loading = usePageDataLoading();
 
 ```
+
+#### 异步任务订阅
+
+我们还提供了`load`的api来订阅异步任务。
+
+```tsx
+function mockPromiseArray() {
+    // 模拟十个异步任务，返回数字
+    const arr: Promise<string>[] = []
+    for (let i = 0; i < 10; i++) {
+        arr.push(new Promise((resolve) => {
+            setTimeout(() => resolve(String(i)), 1000 * i);
+        }))
+    }
+    return arr;
+}
+// store文件
+import { createMapperHooksStore } from "@extremelyjs/store/src/index";
+
+const testAsyncStore = createMapperHooksStore<string>("",{strategy: "acceptSequenced"});
+
+export const useTestAsync = testAsyncStore.useStoreValue;
+
+export const loadTestAsync = testAsyncStore.load;
+
+// react组件
+const testAsync = useTestAsync();
+
+```
+
+同时我们还支持四种异步更新策略
+
+你可以使用 `strategy` 配置异步策略，目前提供了四种异步策略：
+
+| 策略              | 描述 |
+| --- | --- |
+| `acceptFirst`     | 在多个异步任务同时发出的情况下，只接受第一个成功的结果。如果已经有成功的返回，则后续请求不再发出。 |
+| `acceptLatest`    | 在多个异步任务同时发出的情况下，只接受最后一个发出的任务的结果，成功或失败。 |
+| `acceptEvery`     | 在多个异步任务同时发出的情况下，接受所有的返回，按照到达的顺序处理。由于到达的顺序可能是乱序，你需要处理乱序导致的问题。 |
+| `acceptSequenced` | 在多个异步任务同时发出的情况下，按照任务发出的顺序，接受结果，当中间的任务到达时，则不再接受此任务之前发起的任务的结果，但依旧等待后续发出的结果。 |
+
+默认使用 `acceptSequenced` 的策略，这个策略满足绝大多数情况，在你需要特别的优化的时候，你可以选择其他的策略。
+
+#### 直接取值
+
+我们还提供了`getStoreValue`和`getStoreLoading`来直接取值。
 
 ### Todo
 

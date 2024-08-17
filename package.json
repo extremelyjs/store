@@ -1,6 +1,6 @@
 {
   "name": "@extremelyjs/store",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "a store for react",
   "main": "lib/index.js",
   "private": false,

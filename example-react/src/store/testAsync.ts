@@ -5,8 +5,3 @@ const testAsyncStore = createMapperHooksStore<string>("",{strategy: "acceptSeque
 export const useTestAsync = testAsyncStore.useStoreValue;
 
 export const loadTestAsync = testAsyncStore.load;
-
-export const loadByTestAsync = testAsyncStore.loadStoreValue(
-    params => params,
-    fetch
-);
