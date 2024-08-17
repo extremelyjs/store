@@ -1,68 +1,80 @@
-import { useEffect, useState } from "react"
-import { Action, Func, HooksStoreType, Options } from "./type"
-import { createStore, useSelector } from "./core"
+import { useEffect, useState } from "react";
+import { Options, Ref, HooksStoreType, Func, Action } from "./type";
+
 
 /**
- * store的hooks实现
+ * 获取值的类型变化
  *
- * @param initValue 初始值
- * @param options 配置选项
- * @returns 返回一个包含多个方法的对象，用于操作存储
- * @template Result 存储结果的类型
- * @template T 参数的类型
+ * @param currentType 当前值的类型
+ * @param value 值
+ * @returns 返回转换后的值
  */
-const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options?: Options): HooksStoreType<Result,T> => {
-    const store = createStore(e => e,options)
-    const strategy = options?.strategy ?? 'acceptSequenced';
-    let hasLocalStorage = false;
-
-    if (typeof localStorage !== 'undefined') {
-        hasLocalStorage = true;
+const getChangeType = (currentType: string | undefined,value: any) => {
+    switch (currentType) {
+        case "string":
+            return String(value);
+        case "number":
+            return Number(value);
+        case "boolean":
+            return Boolean(value);
+        case "object":
+            return JSON.parse(value);
+        default:
+            return value;
     }
+}
 
-    else if (options?.withLocalStorage != null) {
-        throw new Error("当前环境不支持loaclStorage");
+export function createMapperHooksStore<Result = unknown, Params = unknown>(
+    initValue?: Result,
+    options?: Options
+): HooksStoreType<Result, Params> {
+    // 新版的loaclstorage支持暂时不做
+    const withLocalStorage = options?.withLocalStorage ?? "";
+    let curValue = initValue;
+    if (typeof localStorage !== "undefined" && withLocalStorage !== "") {
+        const token = localStorage.getItem(withLocalStorage)?.split("/");
+        curValue = getChangeType(token?.[1],token?.[0]) ?? void 0;
     }
+    const ref: Ref<Result, Params> = {
+        // loading后续可以自定义
+        loading: false,
+        value: curValue ?? initValue ?? void 0,
+        promiseQueue: new Map<string, Array<Promise<Result>>>(),
+        error: new Map<string, Error>(),
+        listeners: new Map<symbol, Func>(),
+    }
+    const strategy = options?.strategy ?? "acceptSequenced";
 
-    if (hasLocalStorage) {
-        if (initValue != null && localStorage.getItem(options?.withLocalStorage as string) == null) {
-            setStoreValue(initValue);
+    function subscribe(callback: Func) {
+        if (typeof callback === "function") {
+            const key = Symbol();
+            ref.listeners.set(key, callback);
+
+            return () => {
+                ref.listeners.delete(key)
+            }
         }
-
         else {
-            setStoreValue(initValue);
+            throw new Error("callback应该是个函数。")
         }
-
     }
 
-    else {
-        setStoreValue(initValue);
+    function emit() {
+        ref?.listeners?.forEach((callback) => {
+            try {
+                callback();
+            } catch (error: any) {
+                throw new Error(error)
+            }
+        })
     }
 
-    /**
-     * 订阅 store 中的值
-     *
-     * @returns store 中的值
-     */
-    function useStoreValue() {
-        const storeValue = useSelector(store,state => state)
-        return storeValue
-    }
-
-    /**
-     * 设置存储值
-     *
-     * @param value 结果或结果生成函数，或undefined
-     * @throws 如果在设置过程中发生错误，则抛出错误
-    */
     function setStoreValue(value: Result | undefined): void
     function setStoreValue(func: Func<Result>): void
     function setStoreValue(value: Result | Func<Result> | undefined) {
         if (typeof value === 'function') {
             try {
-                store.setIsDispatching(true);
-                store.dispatchSlice((value as Func<Result>))
-                store.setIsDispatching(false)
+                ref.value = (value as Func<Result | undefined>)(ref.value);
             }
             catch (error: any) {
                 throw new Error(error)
@@ -70,32 +82,75 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
         }
         else {
             try {
-                store.setIsDispatching(true);
-                store.dispatchState(value);
-                store.setIsDispatching(false);
+                ref.value = value;
             }
             catch (error: any) {
                 throw new Error(error)
             }
         }
+        if (typeof localStorage !== "undefined" && withLocalStorage !== "") {
+            localStorage.setItem(`${withLocalStorage}`, JSON.stringify(ref.value) + `/${typeof ref.value}`);
+        }
+        emit();
     }
 
-    /**
-     * 加载异步请求并更新
-     *
-     * @param params 参数函数
-     * @param func 异步操作函数
-     * @returns 返回加载存储值的函数
-     */
-    function loadStoreValue(params: Func<T>,func: Action<Result,Promise<Result>>) {
-        async function _loadStoreValue(data: T) {
+    function getStoreValue() {
+        return ref.value;
+    }
+
+    function useStoreValue() {
+        const [selectedState, setSelectedState] = useState<Result | undefined>(ref.value);
+
+        useEffect(
+            () => {
+                const callback = () => {
+                    setSelectedState(getStoreValue());
+                };
+                const unSubscribe = subscribe(callback);
+
+                return () => {
+                    unSubscribe()
+                };
+
+            },
+            [ref.value]
+        );
+
+        return selectedState;
+    }
+
+    function useStoreLoading() {
+        const [loading, setLoading] = useState<boolean>(ref.loading);
+
+        useEffect(
+            () => {
+                const callback = () => {
+                    setLoading(ref.loading);
+                };
+                const unSubscribe = subscribe(callback);
+                return () => {
+                    unSubscribe();
+                }
+            },
+            [ref.loading]
+        );
+
+        return loading;
+    }
+
+    function getStoreLoading() {
+        return ref.loading;
+    }
+
+    function loadStoreValue(params: Func<Params>,func: Action<Result,Promise<Result>>) {
+        async function _loadStoreValue(data: Params) {
             try {
                 queueMicrotask(() => {
-                    store.setIsDispatching(true);
+                    // 设置loading
+                    ref.loading = true;
                 });
 
                 func(params(data)).then((value) => {
-                    store.setIsDispatching(false)
                     setStoreValue(value)
                 })
 
@@ -103,43 +158,9 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
             catch (error: any) {
                 throw new Error(error)
             }
-            finally {
-                store.setIsDispatching(false)
-            }
         }
 
         return _loadStoreValue
-    }
-
-    function getStoreValue() {
-        return store.getState()
-    }
-
-
-    /**
-     * 订阅更新态
-     *
-     * @returns 返回一个boolean值
-     */
-    function useStoreLoading() {
-        const [loading, setLoading] = useState(store.getIsDispatching());
-
-        useEffect(() => {
-            const callback = () => {
-                setLoading(store.getIsDispatching());
-            };
-            const id = Symbol();
-            store.subscribe(id,callback);
-            return () => {
-                store.unSubscribe(id)
-            };
-        }, [store]);
-
-        return loading;
-    }
-
-    function getStoreLoading() {
-        return store.getIsDispatching()
     }
 
     /**
@@ -148,54 +169,52 @@ const createMapperHooksStore = <Result = any,T = any>(initValue?: Result,options
      * @param promiseQueue Promise队列
      * @returns 无返回值
      */
-    async function load(promiseQueue: Promise<Result>[]) {
-        if (strategy === 'acceptEvery') {
-             const result = await Promise.all(promiseQueue);
-             result?.map((item) => {
-                 setStoreValue(item);
-             })
-        }
-
-        else if (strategy === "acceptFirst") {
-            const result = await Promise.race(promiseQueue);
-            setStoreValue(result);
-        }
-
-        else if (strategy === "acceptLatest") {
-            const result = await Promise.allSettled(promiseQueue);
-            const lastResult = result.pop();
-            if (lastResult?.status === 'fulfilled') {
-                setStoreValue(lastResult.value);
+        async function load(promiseQueue: Promise<Result>[]) {
+            if (strategy === 'acceptEvery') {
+                 const result = await Promise.all(promiseQueue);
+                 result?.map((item) => {
+                     setStoreValue(item);
+                 })
             }
+    
+            else if (strategy === "acceptFirst") {
+                const result = await Promise.race(promiseQueue);
+                setStoreValue(result);
+            }
+    
+            else if (strategy === "acceptLatest") {
+                const result = await Promise.allSettled(promiseQueue);
+                const lastResult = result.pop();
+                if (lastResult?.status === 'fulfilled') {
+                    setStoreValue(lastResult.value);
+                }
+                else {
+                    throw new Error('最后一个收到的结果为rejected');
+                }
+            }
+    
             else {
-                throw new Error('最后一个收到的结果为rejected');
+                promiseQueue.forEach((item,index) => {
+                    item.then((value) => {
+                        setStoreValue(value);
+                    })
+                    promiseQueue.slice(index + 1);
+                });
             }
-        }
-
-        else {
-            promiseQueue.forEach((item,index) => {
-                item.then((value) => {
-                    setStoreValue(value);
-                })
-                promiseQueue.slice(index + 1);
-            });
-        }
     }
 
     function reset() {
-        setStoreValue(initValue)
+        ref.value = initValue;
     }
 
     return {
         useStoreValue,
         setStoreValue,
         loadStoreValue,
-        getStoreValue,
         useStoreLoading,
         getStoreLoading,
+        getStoreValue,
+        load,
         reset,
-        load
     }
 }
-
-export { createMapperHooksStore }

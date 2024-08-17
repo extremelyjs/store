@@ -15,10 +15,10 @@ export interface StoreType<T = any> {
     dispatchSlice: (slice: Func) => void;
 }
 export interface HooksStoreType<T = any,Params = any> {
-    useStoreValue: () => T;
+    useStoreValue: () => T | undefined;
     setStoreValue: { (value: T | undefined): void; (func: Func<T>): void; }
     loadStoreValue: (params: Func<Params>,func: Action) => FuncPromise<Params>
-    getStoreValue: () => T;
+    getStoreValue: () => T | undefined;
     useStoreLoading: () => boolean;
     getStoreLoading: () => boolean;
     reset: () => void;
@@ -30,4 +30,12 @@ type Strategy = "acceptFirst" | "acceptLatest" | "acceptEvery" | "acceptSequence
 export interface Options {
     withLocalStorage?: string;
     strategy?: Strategy
+}
+
+export interface Ref<Result = unknown,Params = unknown> {
+    loading: boolean;
+    value: Result | undefined;
+    promiseQueue: Map<string, Promise<Result>[]>;
+    error: Map<string, Error>;
+    listeners: Map<symbol, Func>;
 }

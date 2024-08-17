@@ -1,6 +1,6 @@
-import { createStore } from "@extremelyjs/store/src/index";
+import { createMapperHooksStore } from "@extremelyjs/store/src/index";
 
-const testAsyncStore = createStore<string>("",{strategy: "acceptSequenced"});
+const testAsyncStore = createMapperHooksStore<string>("",{strategy: "acceptSequenced"});
 
 export const useTestAsync = testAsyncStore.useStoreValue;
 
