@@ -1,6 +1,6 @@
-import { createMapperHooksStore } from "@extremelyjs/store/src/index";
+import { createStore } from "@extremelyjs/store/src/index";
 
-const numStore = createMapperHooksStore<number>(0);
+const numStore = createStore<number>(0,{withLocalStorage: "num"});
 
 export const useNum = numStore.useStoreValue;
 
