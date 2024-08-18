@@ -38,6 +38,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     const ref: Ref<Result, Params> = {
         // loading后续可以自定义
         loading: false,
+        // 后续可以换成Map结构，减少数据冗余。
         value: curValue ?? initValue ?? void 0,
         promiseQueue: new Map<string, Array<Promise<Result>>>(),
         error: new Map<string, Error>(),
@@ -98,6 +99,10 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
         return ref.value;
     }
 
+    function getLoading() {
+        return ref.loading;
+    }
+
     function useStoreValue() {
         const [selectedState, setSelectedState] = useState<Result | undefined>(ref.value);
 
@@ -124,13 +129,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
 
         useEffect(
             () => {
-                const callback = () => {
-                    setLoading(ref.loading);
-                };
-                const unSubscribe = subscribe(callback);
-                return () => {
-                    unSubscribe();
-                }
+                setLoading(getLoading());
             },
             [ref.loading]
         );
@@ -151,6 +150,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
                 });
 
                 func(params(data)).then((value) => {
+                    ref.loading = false;
                     setStoreValue(value)
                 })
 
