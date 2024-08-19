@@ -39,3 +39,5 @@ export interface Ref<Result = unknown,Params = unknown> {
     error: Map<string, Error>;
     listeners: Map<symbol, Func>;
 }
+
+export type Listener = () => void;
