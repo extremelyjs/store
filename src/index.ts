@@ -98,6 +98,9 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     function setStoreValue(value: Result | undefined): void
     function setStoreValue(func: Func<Result>): void
     function setStoreValue(value: Result | Func<Result> | undefined) {
+        if (ref.loading) {
+            throw new Error("当前处于加载状态，请等待加载完成。")
+        }
         if (typeof value === 'function') {
             try {
                 ref.value = (value as Func<Result | undefined>)(ref.value);
