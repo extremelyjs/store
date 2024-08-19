@@ -12,12 +12,16 @@
     "build:prod": "npx webpack --mode production",
     "build:dev": "npx webpack --mode development",
     "pre": "npx webpack serve --mode production --open",
-    "dev:vue3": "npx webpack serve --mode development-vue"
+    "dev:vue3": "npx webpack serve --mode development-vue",
+    "lint": "skr lint"
   },
   "repository": "github:extremelyjs/store",
   "license": "MIT",
   "author": "liuyuyang <2281487673@qq.com>",
   "devDependencies": {
+    "@reskript/cli": "^5.7.4",
+    "@reskript/cli-lint": "^5.7.4",
+    "@reskript/config-lint": "^5.7.4",
     "@babel/core": "^7.23.6",
     "@babel/preset-env": "^7.23.6",
     "@babel/preset-react": "^7.23.3",

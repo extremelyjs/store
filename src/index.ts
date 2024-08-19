@@ -1,5 +1,5 @@
-import { useMemo, useSyncExternalStore } from "react";
-import { Options, Ref, HooksStoreType, Func, Action, Listener } from "./type";
+import {useMemo, useSyncExternalStore} from 'react';
+import {Options, Ref, HooksStoreType, Func, Action, Listener} from './type';
 
 
 /**
@@ -9,53 +9,62 @@ import { Options, Ref, HooksStoreType, Func, Action, Listener } from "./type";
  * @param value 值
  * @returns 返回转换后的值
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getChangeType = (currentType: string | undefined, value: any) => {
     switch (currentType) {
-        case "string":
+        case 'string':
             return String(value);
-        case "number":
+        case 'number':
             return Number(value);
-        case "boolean":
+        case 'boolean':
             return Boolean(value);
-        case "object":
+        case 'object':
             return JSON.parse(value);
         default:
             return value;
     }
-}
+};
 
 export function createMapperHooksStore<Result = unknown, Params = unknown>(
     initValue?: Result,
     options?: Options
 ): HooksStoreType<Result, Params> {
-    const withLocalStorage = options?.withLocalStorage ?? "";
+    const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
-    if (typeof localStorage !== "undefined" && withLocalStorage !== "") {
-        const token = localStorage.getItem(withLocalStorage)?.split("/");
-        curValue = getChangeType(token?.[1], token?.[0]) ?? void 0;
+    if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
+        const token = localStorage.getItem(withLocalStorage)?.split('/');
+        curValue = getChangeType(token?.[1], token?.[0]) ?? undefined;
     }
     const ref: Ref<Result, Params> = {
         // loading后续可以自定义
         loading: false,
         // 后续可以换成Map结构，减少数据冗余。
-        value: curValue ?? initValue ?? void 0,
+        value: curValue ?? initValue ?? undefined,
         promiseQueue: new Map<string, Array<Promise<Result>>>(),
         error: new Map<string, Error>(),
         listeners: new Map<symbol, Func>(),
+    };
+    const strategy = options?.strategy ?? 'acceptSequenced';
+
+    function getStoreValue() {
+        return ref.value;
     }
-    const strategy = options?.strategy ?? "acceptSequenced";
+
+    function getStoreLoading() {
+        return ref.loading;
+    }
 
     function subscribe(callback: Func) {
-        if (typeof callback === "function") {
-            const key = Symbol();
+        if (typeof callback === 'function') {
+            const key = Symbol('id');
             ref.listeners.set(key, callback);
 
             return () => {
-                ref.listeners.delete(key)
-            }
+                ref.listeners.delete(key);
+            };
         }
         else {
-            throw new Error("callback应该是个函数。")
+            throw new Error('callback应该是个函数。');
         }
     }
 
@@ -66,65 +75,66 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
                     getCurrentValue: () => getStoreValue(),
                     subscribeFunc: (listener: Listener) => subscribe(listener),
                 }
-            ), []
-        )
+            ),
+            []
+        );
 
         return subscription;
-    }
+    };
 
     const useLoadingSelectorSubscription = () => {
         const subscription = useMemo(
             () => (
                 {
                     getCurrentLoading: () => getStoreLoading(),
-                    subscribeFunc: (listener: Listener) => subscribe(listener)
+                    subscribeFunc: (listener: Listener) => subscribe(listener),
                 }
-            ), []
-        )
+            ),
+            []
+        );
 
         return subscription;
-    }
+    };
 
     function emit() {
-        ref?.listeners?.forEach((callback) => {
+        ref?.listeners?.forEach(callback => {
             try {
                 callback();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
-                throw new Error(error)
+                throw new Error(error);
             }
-        })
+        });
     }
 
-    function setStoreValue(value: Result | undefined): void
-    function setStoreValue(func: Func<Result>): void
+    function setStoreValue(value: Result | undefined): void;
+    function setStoreValue(func: Func<Result>): void;
     function setStoreValue(value: Result | Func<Result> | undefined) {
         if (ref.loading) {
-            throw new Error("当前处于加载状态，请等待加载完成。")
+            throw new Error('当前处于加载状态，请等待加载完成。');
         }
         if (typeof value === 'function') {
             try {
-                ref.value = (value as Func<Result | undefined>)(ref.value);
+                ref.value = (value as Func<Result | undefined, Result | undefined>)(ref.value);
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
-                throw new Error(error)
+                throw new Error(error);
             }
         }
         else {
             try {
                 ref.value = value;
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
-                throw new Error(error)
+                throw new Error(error);
             }
         }
-        if (typeof localStorage !== "undefined" && withLocalStorage !== "") {
+        if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
             localStorage.setItem(`${withLocalStorage}`, JSON.stringify(ref.value) + `/${typeof ref.value}`);
         }
         emit();
-    }
-
-    function getStoreValue() {
-        return ref.value;
     }
 
     function useStoreValue() {
@@ -134,14 +144,11 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
 
     function useStoreLoading() {
         const subscription = useLoadingSelectorSubscription();
-        return useSyncExternalStore(subscription.subscribeFunc,subscription.getCurrentLoading)
+        return useSyncExternalStore(subscription.subscribeFunc, subscription.getCurrentLoading);
     }
 
-    function getStoreLoading() {
-        return ref.loading;
-    }
-
-    function loadStoreValue(params: Func<Params>, func: Action<Result, Promise<Result>>) {
+    function loadStoreValue(params: Func<Params, Result>, func: Action<Result, Promise<Result>>) {
+        // eslint-disable-next-line no-underscore-dangle
         async function _loadStoreValue(data: Params) {
             try {
                 queueMicrotask(() => {
@@ -149,18 +156,19 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
                     ref.loading = true;
                 });
 
-                func(params(data)).then((value) => {
+                func(params(data)).then(value => {
                     ref.loading = false;
-                    setStoreValue(value)
-                })
+                    setStoreValue(value);
+                });
 
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
-                throw new Error(error)
+                throw new Error(error);
             }
         }
 
-        return _loadStoreValue
+        return _loadStoreValue;
     }
 
     /**
@@ -169,20 +177,20 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      * @param promiseQueue Promise队列
      * @returns 无返回值
      */
-    async function load(promiseQueue: Promise<Result>[]) {
+    async function load(promiseQueue: Array<Promise<Result>>) {
         if (strategy === 'acceptEvery') {
             const result = await Promise.all(promiseQueue);
-            result?.map((item) => {
-                setStoreValue(item);
-            })
+            result?.map(
+                item => setStoreValue(item)
+            );
         }
 
-        else if (strategy === "acceptFirst") {
+        else if (strategy === 'acceptFirst') {
             const result = await Promise.race(promiseQueue);
             setStoreValue(result);
         }
 
-        else if (strategy === "acceptLatest") {
+        else if (strategy === 'acceptLatest') {
             const result = await Promise.allSettled(promiseQueue);
             const lastResult = result.pop();
             if (lastResult?.status === 'fulfilled') {
@@ -195,9 +203,9 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
 
         else {
             promiseQueue.forEach((item, index) => {
-                item.then((value) => {
+                item.then(value => {
                     setStoreValue(value);
-                })
+                });
                 promiseQueue.slice(index + 1);
             });
         }
@@ -216,5 +224,5 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
         getStoreValue,
         load,
         reset,
-    }
+    };
 }

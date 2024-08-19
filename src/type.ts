@@ -1,43 +1,48 @@
-export type Func<T = any> = (...args: T[]) => any;
+export type Func<T = unknown, V = unknown> = (...args: T[]) => V;
 
-export type Action<T = any, V = any> = (...args: T[]) => V;
+export type Action<T = unknown, V = unknown> = (...args: T[]) => V;
 
-export type FuncPromise<T = any> = (data: T) => Promise<void>;
+export type FuncPromise<T = unknown> = (data: T) => Promise<void>;
 
-export interface StoreType<T = any> {
-    subscribe: (id:Symbol,callback: Func) => void;
-    dispatch: (action?: any) => void;
+export interface StoreType<T = unknown> {
+    subscribe: (id: symbol, callback: Func) => void;
+    dispatch: (action?: unknown) => void;
     dispatchState: (state: T | Func) => void;
     getState: () => T | undefined;
-    unSubscribe: (id: Symbol) => void;
+    unSubscribe: (id: symbol) => void;
     getIsDispatching: () => boolean;
     setIsDispatching: (e: boolean) => void;
     dispatchSlice: (slice: Func) => void;
 }
-export interface HooksStoreType<T = any,Params = any> {
+export interface HooksStoreType<T = unknown, Params = unknown> {
     useStoreValue: () => T | undefined;
-    setStoreValue: { (value: T | undefined): void; (func: Func<T>): void; }
-    loadStoreValue: (params: Func<Params>,func: Action) => FuncPromise<Params>
+    setStoreValue: {
+        (value: T | undefined): void;
+        // eslint-disable-next-line @typescript-eslint/unified-signatures
+        (func: Func<T>): void;
+     };
+    loadStoreValue: (params: Func<Params, T>, func: Action<T, Promise<T>>) => FuncPromise<Params>;
     getStoreValue: () => T | undefined;
     useStoreLoading: () => boolean;
     getStoreLoading: () => boolean;
     reset: () => void;
-    load: (params: Promise<T>[]) => Promise<void>;
+    load: (params: Array<Promise<T>>) => Promise<void>;
 }
 
-type Strategy = "acceptFirst" | "acceptLatest" | "acceptEvery" | "acceptSequenced";
+type Strategy = 'acceptFirst' | 'acceptLatest' | 'acceptEvery' | 'acceptSequenced';
 
 export interface Options {
     withLocalStorage?: string;
-    strategy?: Strategy
+    strategy?: Strategy;
 }
 
-export interface Ref<Result = unknown,Params = unknown> {
+export interface Ref<Result = unknown, Params = unknown> {
     loading: boolean;
     value: Result | undefined;
-    promiseQueue: Map<string, Promise<Result>[]>;
+    promiseQueue: Map<string, Array<Promise<Result>>>;
     error: Map<string, Error>;
     listeners: Map<symbol, Func>;
+    params?: Params;
 }
 
 export type Listener = () => void;
