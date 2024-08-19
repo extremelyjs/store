@@ -28,7 +28,6 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     initValue?: Result,
     options?: Options
 ): HooksStoreType<Result, Params> {
-    // 新版的loaclstorage支持暂时不做
     const withLocalStorage = options?.withLocalStorage ?? "";
     let curValue = initValue;
     if (typeof localStorage !== "undefined" && withLocalStorage !== "") {
