@@ -21,7 +21,7 @@ const getChangeType = (currentType: string | undefined, value: any) => {
         case 'object':
             return JSON.parse(value);
         default:
-            return value;
+            return undefined;
     }
 };
 
@@ -39,8 +39,10 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
     if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
-        const token = localStorage.getItem(withLocalStorage);
+        const token = !localStorage.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : localStorage.getItem(withLocalStorage);
+        console.log(typeof token);
         const obj = JSON.parse(token as string);
+        console.log('obj', obj);
         curValue = getChangeType(obj.type, obj.value) ?? undefined;
     }
     const ref: Ref<Result, Params> = {
