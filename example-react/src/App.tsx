@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import Button from "./components/Button";
 import { useNum } from "./store/num";
 import { loadTestAsync, useTestAsync } from "./store/testAsync";
 import { mockPromiseArray } from "./mock/mockPromiseArray";
 import { loadIndexData, useIndexData, useIndexDataLoading } from "./store/indexData";
+import { setStr, useStr } from "./store/str";
 
 
 function App() {
@@ -18,6 +19,11 @@ function App() {
   }, [])
 
   console.log("indexLoading", indexValueLoading)
+  const str = useStr();
+
+  const handleChange = useCallback(() => {
+    setStr(v => v+"xxx");
+  },[])
 
   return (
     <div>
@@ -36,6 +42,8 @@ function App() {
           indexValueLoading === true ? "loading" : JSON.stringify(indexValue)
         }
       </p>
+      {str}
+      <button onClick={handleChange}>+xxx</button>
     </div>
   )
 }
