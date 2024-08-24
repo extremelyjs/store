@@ -39,8 +39,9 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
     if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
-        const token = localStorage.getItem(withLocalStorage)?.split('/');
-        curValue = getChangeType(token?.[1], token?.[0]) ?? undefined;
+        const token = localStorage.getItem(withLocalStorage);
+        const obj = JSON.parse(token as string);
+        curValue = getChangeType(obj.type, obj.value) ?? undefined;
     }
     const ref: Ref<Result, Params> = {
         // loading后续可以自定义
@@ -175,7 +176,11 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
             }
         }
         if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
-            localStorage.setItem(`${withLocalStorage}`, JSON.stringify(ref.value) + `/${typeof ref.value}`);
+            const obj = {
+                value: JSON.stringify(ref.value),
+                type: typeof ref.value,
+            };
+            localStorage.setItem(`${withLocalStorage}`, JSON.stringify(obj));
         }
         emit();
     }
