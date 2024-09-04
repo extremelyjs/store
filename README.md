@@ -12,6 +12,38 @@
 
 - 写法上更加自由，心智负担更小，同时可以结合异步请求，异步事件，loading订阅和值订阅。来进一步优化代码结构，建立起统一的代码规范。
 
+### 对比其他竞品状态管理库
+1. Redux
+Redux 是一个流行的 JavaScript 状态管理库，它采用单向数据流和可预测的状态更新机制。然而，与 @extremelyjs/store 相比，Redux 在某些方面可能显得更为复杂：
+
+- 概念复杂度：Redux 引入了 action、reducer 和 store 等概念，需要开发者理解和遵循一定的规范。相比之下，@extremelyjs/store 提供了更简洁的 API，减少了概念上的负担。
+
+- 异步处理：Redux 本身并不直接支持异步操作，通常需要结合额外的中间件（如 redux-thunk 或 redux-saga）来处理。而 @extremelyjs/store 内置了异步更新能力，通过 loadStoreValue 等 API 可以方便地处理异步操作。
+
+- 类型安全：虽然 Redux 可以与 TypeScript 结合使用以提供类型安全，但 @extremelyjs/store 本身采用 TypeScript 开发，提供了更完善的类型提示和类型安全。
+
+- 持久化存储：Redux 需要额外的配置和库支持才能实现状态的持久化存储。@extremelyjs/store 则内置了持久化能力，只需简单配置即可使用。
+
+2. Zustand
+Zustand 是一个轻量级且灵活的状态管理库，它允许你在单个 store 中存储多个独立的状态片段。与 @extremelyjs/store 相比Zustand：
+
+- 轻量级与灵活性：Zustand 非常轻量级，并且提供了灵活的 API 来管理状态。然而，@extremelyjs/store 也致力于提供简洁和灵活的 API，同时在异步处理和持久化方面提供了更多内置功能。
+
+- 异步与持久化：与 Redux 类似，Zustand 本身不直接支持异步操作和持久化存储。虽然可以通过扩展来实现这些功能，但 @extremelyjs/store 已经内置了这些能力。
+
+- 类型安全：Zustand 可以与 TypeScript 结合使用，但 @extremelyjs/store 在类型安全方面可能更为出色，因为它本身采用 TypeScript 开发。
+
+3. MobX
+MobX 是另一个流行的状态管理库，它使用可观察对象和自动跟踪机制来简化状态管理。与 @extremelyjs/store 相比：
+
+- 概念与复杂性：MobX 引入了可观察对象、观察者和动作等概念。虽然这些概念使得状态管理变得直观和强大，但也增加了一定的学习成本。@extremelyjs/store 则通过更简洁的 API 和发布订阅模式来降低复杂性。
+
+- 异步与持久化：MobX 本身不直接处理异步操作和持久化存储，需要开发者自行实现或结合其他库。而 @extremelyjs/store 提供了内置的异步更新和持久化能力。
+
+- 类型安全：虽然 MobX 可以与 TypeScript 结合使用以提供类型安全，但如前所述，@extremelyjs/store 在这方面可能更为出色。
+
+综上所述，@extremelyjs/store 在提供简洁灵活的 API、内置异步更新与持久化能力以及出色的类型安全方面表现出色。这使得它在与其他竞品状态管理库的比较中具有一定的优势。
+
 ## 文档
 
 下面是React Hooks的使用文档。class组件的使用暂没有良好的支持。
