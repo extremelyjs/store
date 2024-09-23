@@ -17,3 +17,6 @@ tsconfig.json
 example-react/
 example-vue/
 example-node/
+.vscode
+pnpm-workspace.yaml
+.eslintrc.cjs
