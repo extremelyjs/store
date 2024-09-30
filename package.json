@@ -1,6 +1,6 @@
 {
   "name": "@extremelyjs/store",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "a store for react",
   "main": "lib/index.js",
   "private": false,
@@ -28,9 +28,11 @@
     "@types/react-dom": "^18.2.18",
     "babel-preset-react": "^6.24.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@types/use-sync-external-store": "^0.0.6"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^2.0.0"
+    "@react-native-async-storage/async-storage": "^2.0.0",
+    "use-sync-external-store": "^1.2.0"
   }
 }

@@ -1,4 +1,5 @@
-import {useMemo, useSyncExternalStore} from 'react';
+import {useMemo} from 'react';
+import {useSyncExternalStore} from 'use-sync-external-store/shim';
 import {Options, Ref, HooksStoreType, Func, Action, Listener} from './type';
 import {getLocalObject} from './utils/local';
 
