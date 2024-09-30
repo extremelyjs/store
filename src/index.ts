@@ -1,5 +1,6 @@
 import {useMemo, useSyncExternalStore} from 'react';
 import {Options, Ref, HooksStoreType, Func, Action, Listener} from './type';
+import {getLocalObject} from './utils/local';
 
 
 /**
@@ -38,8 +39,9 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
 ): HooksStoreType<Result, Params> {
     const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
-    if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
-        const token = !localStorage.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : localStorage.getItem(withLocalStorage);
+    const local = getLocalObject(options?.isReactNative ? 'ReactNative' : 'web');
+    if (typeof local !== 'undefined' && withLocalStorage !== '') {
+        const token = !local.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : local.getItem(withLocalStorage);
         const obj = JSON.parse(token as string);
         curValue = getChangeType(obj.type, obj.value) ?? undefined;
     }
@@ -175,12 +177,12 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
                 throw new Error(error);
             }
         }
-        if (typeof localStorage !== 'undefined' && withLocalStorage !== '') {
+        if (typeof local !== 'undefined' && withLocalStorage !== '') {
             const obj = {
                 value: typeof ref.value === 'string' ? ref.value : JSON.stringify(ref.value),
                 type: typeof ref.value,
             };
-            localStorage.setItem(`${withLocalStorage}`, JSON.stringify(obj));
+            local.setItem(`${withLocalStorage}`, JSON.stringify(obj));
         }
         emit();
     }

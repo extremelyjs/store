@@ -1,18 +1,14 @@
 {
   "name": "@extremelyjs/store",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "a store for react",
   "main": "lib/index.js",
   "private": false,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx webpack serve --mode development",
-    "prod": "npx webpack serve --mdoe production",
-    "build": "rm -rf ./lib && tsc",
-    "build:prod": "npx webpack --mode production",
-    "build:dev": "npx webpack --mode development",
-    "pre": "npx webpack serve --mode production --open",
-    "dev:vue3": "npx webpack serve --mode development-vue",
+    "test": "echo \"暂时无测试用例\" && exit 0",
+    "serve": "cd ./example-node && pnpm run dev",
+    "dev": "cd ./example-react && pnpm run dev",
+    "build": "pnpm lint && rm -rf ./lib && tsc",
     "lint": "skr lint"
   },
   "repository": "github:extremelyjs/store",
@@ -30,6 +26,7 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.0.0",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
     "babel-preset-react": "^6.24.1",

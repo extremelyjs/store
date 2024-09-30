@@ -147,7 +147,7 @@
   },
   "vsicons.dontShowNewVersionMessage": true,
   "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.html-language-features"
   },
   "baidu.comate.inlineSuggestionMode": "extremeAccurate",
   "editor.minimap.enabled": false,

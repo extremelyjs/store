@@ -34,6 +34,7 @@ type Strategy = 'acceptFirst' | 'acceptLatest' | 'acceptEvery' | 'acceptSequence
 export interface Options {
     withLocalStorage?: string;
     strategy?: Strategy;
+    isReactNative?: boolean;
 }
 
 export interface Ref<Result = unknown, Params = unknown> {

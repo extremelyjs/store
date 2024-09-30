@@ -59,7 +59,7 @@ npm install @extremelyjs/store --save
 ### 使用方式
 要求:
 - React Hooks版本
-- 如果需要本地持久化存储，需要在有localStorage的环境下使用（例如React native可以使用这个库，但是无法使用本地持久化能力）
+- 如果需要本地持久化存储，需要在有localStorage或者ReactNative的环境下使用
 
 #### 入门
 
@@ -115,6 +115,12 @@ export const resetNum = numStore.reset // 重置state
 
 ```tsx
   const num = createMapperHooksStore<number>(0, {withLocalStorage: 'keyName'}) // keyName为自定义id
+```
+
+rn环境下，需要加上是rn的标志
+
+```tsx
+  const num = createMapperHooksStore<number>(0, {withLocalStorage: 'keyName',isReactNative: true}) // keyName为自定义id
 ```
 
 #### 异步更新能力
@@ -224,8 +230,6 @@ const testAsync = useTestAsync();
 ### Todo
 
 - 完善文档
-
-- 对于ReactNaitve，小程序的本地持久化支持
 
 - 更好的错误提示
 
