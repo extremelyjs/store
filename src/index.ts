@@ -2,30 +2,8 @@ import {useMemo} from 'react';
 import {useSyncExternalStore} from 'use-sync-external-store/shim';
 import {Options, Ref, HooksStoreType, Func, Action, Listener} from './type';
 import {getLocalObject} from './utils/local';
+import {getChangeType} from './utils/getChangeType';
 
-
-/**
- * 获取值的类型变化
- *
- * @param currentType 当前值的类型
- * @param value 值
- * @returns 返回转换后的值
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const getChangeType = (currentType: string | undefined, value: any) => {
-    switch (currentType) {
-        case 'string':
-            return String(value);
-        case 'number':
-            return Number(value);
-        case 'boolean':
-            return Boolean(value);
-        case 'object':
-            return JSON.parse(value);
-        default:
-            return undefined;
-    }
-};
 
 /**
  * 创建一个用于存储和管理映射关系的 HooksStore

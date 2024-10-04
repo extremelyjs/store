@@ -20,3 +20,6 @@ example-node/
 .vscode
 pnpm-workspace.yaml
 .eslintrc.cjs
+jest.config.js
+.travis.yml
+scripts

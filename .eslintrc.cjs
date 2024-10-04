@@ -10,8 +10,7 @@ module.exports = {
         'no-negated-condition': 'off',
         'prefer-promise-reject-errors': 'off',
         '@typescript-eslint/init-declarations': 'off',
-        // open some rules
         '@typescript-eslint/prefer-ts-expect-error': 'error',
         '@typescript-eslint/no-explicit-any': 'error',
-    }
+    },
 };
