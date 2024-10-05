@@ -60,7 +60,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      * @returns 返回一个函数，用于取消
      * @throws 当callback不是函数时，抛出错误
      */
-    function subscribe(callback: Func) {
+    function private_subscribe(callback: Func) {
         if (typeof callback === 'function') {
             const key = Symbol('id');
             ref.listeners.set(key, callback);
@@ -84,7 +84,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
             () => (
                 {
                     getCurrentValue: () => getStoreValue(),
-                    subscribeFunc: (listener: Listener) => subscribe(listener),
+                    subscribeFunc: (listener: Listener) => private_subscribe(listener),
                 }
             ),
             []
@@ -103,7 +103,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
             () => (
                 {
                     getCurrentLoading: () => getStoreLoading(),
-                    subscribeFunc: (listener: Listener) => subscribe(listener),
+                    subscribeFunc: (listener: Listener) => private_subscribe(listener),
                 }
             ),
             []
@@ -115,7 +115,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     /**
      * 触发事件，执行注册的所有回调函数
      */
-    function emit() {
+    function private_emit() {
         ref?.listeners?.forEach(callback => {
             try {
                 callback();
@@ -163,7 +163,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
             };
             local.setItem(`${withLocalStorage}`, JSON.stringify(obj));
         }
-        emit();
+        private_emit();
     }
 
     /**
@@ -193,7 +193,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      * @param func 函数类型，参数为Result类型，返回值为Promise<Result>类型
      * @returns 返回一个异步函数，参数为Params类型，无返回值
      */
-    function loadStoreValue(params: Func<Params, Result>, func: Action<Result, Promise<Result>>) {
+    function loadStoreValue(params: Func<Params, Params>, func: Action<Params, Promise<Result>>) {
         // eslint-disable-next-line no-underscore-dangle
         async function _loadStoreValue(data: Params) {
             try {

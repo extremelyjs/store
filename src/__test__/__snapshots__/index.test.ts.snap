@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`react Subscribe to num value 1`] = `[Function]`;
+
+exports[`react getLoading 1`] = `[Function]`;
+
+exports[`react load 1`] = `[Function]`;
+
+exports[`react loadQueue 1`] = `[Function]`;
+
+exports[`react loading 1`] = `[Function]`;
+
+exports[`react reset 1`] = `[Function]`;
+
+exports[`react useStoreLoading 1`] = `[Function]`;
+
+exports[`react useStoreValue 1`] = `[Function]`;

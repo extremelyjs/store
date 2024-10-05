@@ -21,7 +21,7 @@ export interface HooksStoreType<T = unknown, Params = unknown> {
         // eslint-disable-next-line @typescript-eslint/unified-signatures
         (func: Func<T>): void;
      };
-    loadStoreValue: (params: Func<Params, T>, func: Action<T, Promise<T>>) => FuncPromise<Params>;
+    loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>) => FuncPromise<Params>;
     getStoreValue: () => T | undefined;
     useStoreLoading: () => boolean;
     getStoreLoading: () => boolean;
