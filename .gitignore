@@ -3,3 +3,4 @@ lib/
 exmaple-node/node_modules/
 example-react/node_modules/
 example-vue/
+coverage/
