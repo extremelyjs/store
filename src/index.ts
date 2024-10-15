@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {useSyncExternalStore} from 'use-sync-external-store/shim';
-import {Options, Ref, HooksStoreType, Func, Action, Listener} from './type';
+import {Options, Ref, HooksStoreType, Func, Action, Listener, HooksStorePureType} from './type';
 import {getLocalObject} from './utils/local';
 import {getChangeType} from './utils/getChangeType';
 
@@ -12,10 +12,19 @@ import {getChangeType} from './utils/getChangeType';
  * @param options 配置选项
  * @returns 返回 HooksStoreType 类型的对象，包含多个用于操作数据的函数和方法
  */
-export function createMapperHooksStore<Result = unknown, Params = unknown>(
+export function createMapperHooksStore <Result = unknown, Params = unknown>(
+    initValue?: void | undefined,
+    options?: Options
+): HooksStorePureType<Result, Params>;
+export function createMapperHooksStore <Result = unknown, Params = unknown>(
+    // eslint-disable-next-line @typescript-eslint/unified-signatures
     initValue?: Result,
     options?: Options
-): HooksStoreType<Result, Params> {
+): HooksStoreType<Result, Params>;
+export function createMapperHooksStore<Result = unknown, Params = unknown>(
+    initValue?: void | undefined | Result,
+    options?: Options
+): HooksStoreType<Result, Params> | HooksStorePureType<Result, Params> {
     const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
     const local = getLocalObject(options?.isReactNative ? 'ReactNative' : 'web');
@@ -28,7 +37,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
         // loading后续可以自定义
         loading: false,
         // 后续可以换成Map结构，减少数据冗余。
-        value: curValue ?? initValue ?? undefined,
+        value: curValue as Result ?? initValue as Result,
         promiseQueue: new Map<string, Array<Promise<Result>>>(),
         error: new Map<string, Error>(),
         listeners: new Map<symbol, Func>(),
@@ -134,13 +143,13 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     */
     function setStoreValue(value: Result | undefined): void;
     function setStoreValue(func: Func<Result>): void;
-    function setStoreValue(value: Result | Func<Result> | undefined) {
+    function setStoreValue(value: Func<Result> | Result | undefined) {
         if (ref.loading) {
             throw new Error('当前处于加载状态，请等待加载完成。');
         }
         if (typeof value === 'function') {
             try {
-                ref.value = (value as Func<Result | undefined, Result | undefined>)(ref.value);
+                ref.value = (value as Func<Result, Result>)(ref.value as Result);
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
@@ -263,7 +272,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      * @description 将 ref 的值重置为初始值
      */
     function reset() {
-        ref.value = initValue;
+        setStoreValue(initValue as Result);
     }
 
     return {

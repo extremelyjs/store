@@ -15,18 +15,29 @@ export interface StoreType<T = unknown> {
     dispatchSlice: (slice: Func) => void;
 }
 export interface HooksStoreType<T = unknown, Params = unknown> {
+    useStoreValue: () => T;
+    setStoreValue: {
+        (value: T): void;
+        // eslint-disable-next-line @typescript-eslint/unified-signatures
+        (func: Func<T>): void;
+     };
+    loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>) => FuncPromise<Params>;
+    getStoreValue: () => T;
+    useStoreLoading: () => boolean;
+    getStoreLoading: () => boolean;
+    reset: () => void;
+    load: (params: Array<Promise<T>>) => Promise<void>;
+}
+
+export interface HooksStorePureType<T = unknown, Params = unknown> extends Omit<HooksStoreType<T, Params>, 'loadStoreValue' | 'setStoreValue' | 'useStoreValue' | 'getStoreValue'> {
     useStoreValue: () => T | undefined;
+    getStoreValue: () => T | undefined;
     setStoreValue: {
         (value: T | undefined): void;
         // eslint-disable-next-line @typescript-eslint/unified-signatures
         (func: Func<T>): void;
      };
     loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>) => FuncPromise<Params>;
-    getStoreValue: () => T | undefined;
-    useStoreLoading: () => boolean;
-    getStoreLoading: () => boolean;
-    reset: () => void;
-    load: (params: Array<Promise<T>>) => Promise<void>;
 }
 
 type Strategy = 'acceptFirst' | 'acceptLatest' | 'acceptEvery' | 'acceptSequenced';

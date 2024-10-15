@@ -1,13 +1,13 @@
 {
   "name": "@extremelyjs/store",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "a store for react",
   "main": "lib/index.js",
   "private": false,
   "scripts": {
     "serve": "cd ./example-node && pnpm run dev",
     "dev": "cd ./example-react && pnpm run dev",
-    "build": "pnpm lint && rm -rf ./lib && tsc",
+    "build": "rm -rf ./lib && tsc",
     "lint": "skr lint",
     "test": "skr test -- --coverage"
   },
