@@ -6,6 +6,7 @@ import { mockPromiseArray } from "./mock/mockPromiseArray";
 import { loadIndexData, useIndexData, useIndexDataLoading } from "./store/indexData";
 import { setStr, useStr } from "./store/str";
 import { setTestArr, useTestArr } from "./store/arr";
+import { setTestObject, useTestObject } from "./store/testObject";
 
 
 function App() {
@@ -15,10 +16,18 @@ function App() {
   const indexValueLoading = useIndexDataLoading();
   const testArr = useTestArr();
   console.log(testArr);
-
+  const userInfo = useTestObject<string>((value) => value?.id);
+  console.log("--userInfo--")
+  console.log(userInfo);
   useEffect(() => {
     loadTestAsync(mockPromiseArray());
     loadIndexData("Hello");
+    setTestObject({
+      id: '1',
+      name: "zhangsan",
+      age: 18,
+      address: "beijing"
+    })
   }, [])
 
   console.log("indexLoading", indexValueLoading)
@@ -43,13 +52,23 @@ function App() {
     }]);
   },[])
 
-  // console.log(testArr[0].test)
+  const handleSetUserInfo = useCallback(() => {
+    setTestObject(v => (
+      {
+        ...v,
+        name: "lisi"
+      }
+    ))
+  },[])
 
   return (
     <div>
       <h1>demo</h1>
       <button onClick={handleSetTestArray}>
         setTestArray
+      </button>
+      <button onClick={handleSetUserInfo}>
+        setUserInfo
       </button>
       <h2>{num}</h2>
       <Button></Button>

@@ -6,7 +6,10 @@ interface TestArrType {
     test3: number;
 }
 
-const testArrStore = createMapperHooksStore<TestArrType[]>();
+const testArrStore = createMapperHooksStore<TestArrType[]>([
+    { test: "test", test2: "test2", test3: 1 },
+    { test: "test", test2: "test2", test3: 1 },
+]);
 
 export const useTestArr = testArrStore.useStoreValue;
 

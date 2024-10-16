@@ -109,6 +109,44 @@ export const resetNum = numStore.reset // 重置state
 
 ```
 
+#### 局部更新能力
+用户在订阅一个大对象的时候，一些场景下只关注对象的一个属性，全量更新下会带来性能问题。
+
+所以支持了局部更新能力。
+
+```tsx
+
+import { createMapperHooksStore } from "@extremelyjs/store/src/index";
+
+interface MyInfo {
+    id: string;
+    name: string;
+    age: number;
+    address: string;
+}
+
+const testObjectStore = createMapperHooksStore<MyInfo>({
+    id: '1',
+    name: "zhangsan",
+    age: 18,
+    address: "beijing"
+  });
+
+export const useTestObject = testObjectStore.useStoreValue;
+
+export const setTestObject = testObjectStore.setStoreValue;
+
+```
+
+创建上还是正常的创建方式。
+
+使用上我们可以传递类型和selctor函数来实现只订阅局部更新的变化。
+
+```tsx
+const userInfo = useTestObject<string>((value) => value?.id); // 只订阅id的变化
+
+```
+
 #### 持久化
 
 对于支持localStorage的环境，可以使用持久化能力。

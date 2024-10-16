@@ -88,15 +88,28 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      *
      * @returns 返回一个包含getCurrentValue和subscribeFunc的对象，用于useSyncExternalStore里的参数
      */
-    const useValueSelectorSubscription = () => {
+    const useValueSelectorSubscription = <TResult>(selector?: (value: Result | undefined) => TResult) => {
         const subscription = useMemo(
             () => (
                 {
-                    getCurrentValue: () => getStoreValue(),
+                    getCurrentValue: () => {
+                        const currentValue = getStoreValue();
+                        if (!selector) {
+                            return currentValue;
+                        }
+                        try {
+                            return selector(currentValue);
+                        }
+                        catch (e) {
+                            console.error(e);
+                            console.error('Above error occurs in selector.');
+                            return currentValue;
+                        }
+                    },
                     subscribeFunc: (listener: Listener) => private_subscribe(listener),
                 }
             ),
-            []
+            [selector]
         );
 
         return subscription;
@@ -180,9 +193,10 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      *
      * @returns 返回同步后的store值
      */
-    function useStoreValue() {
-        const subscription = useValueSelectorSubscription();
-        return useSyncExternalStore(subscription.subscribeFunc, subscription.getCurrentValue);
+    function useStoreValue<ReturnResult>(selector?: <ReturnResult>(value: Result | undefined) => ReturnResult | undefined) {
+        const subscription = useValueSelectorSubscription(selector);
+        const result = useSyncExternalStore(subscription.subscribeFunc, subscription.getCurrentValue);
+        return result as ReturnResult | Result | undefined;
     }
 
     /**

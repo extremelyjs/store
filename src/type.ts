@@ -15,7 +15,10 @@ export interface StoreType<T = unknown> {
     dispatchSlice: (slice: Func) => void;
 }
 export interface HooksStoreType<T = unknown, Params = unknown> {
-    useStoreValue: () => T;
+    useStoreValue: {
+        (): T;
+        <ResultType>(selector?: (value: T) => ResultType): ResultType;
+    };
     setStoreValue: {
         (value: T): void;
         // eslint-disable-next-line @typescript-eslint/unified-signatures
@@ -30,7 +33,10 @@ export interface HooksStoreType<T = unknown, Params = unknown> {
 }
 
 export interface HooksStorePureType<T = unknown, Params = unknown> extends Omit<HooksStoreType<T, Params>, 'loadStoreValue' | 'setStoreValue' | 'useStoreValue' | 'getStoreValue'> {
-    useStoreValue: () => T | undefined;
+    useStoreValue: {
+        (): T | undefined;
+        <ResultType>(selector?: (value: T | undefined) => ResultType | undefined): ResultType | undefined;
+    };
     getStoreValue: () => T | undefined;
     setStoreValue: {
         (value: T | undefined): void;
