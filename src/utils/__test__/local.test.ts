@@ -1,15 +1,14 @@
 // local.test.ts
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getLocalObject} from '../local';
 
 describe('getLocalObject function', () => {
     test('should return AsyncStorage when env is ReactNative', () => {
-        const result = getLocalObject('ReactNative');
-        expect(result).toBe(AsyncStorage);
+        const result = getLocalObject();
+        expect(result).toBe(localStorage);
     });
 
     test('should return localStorage when env is not ReactNative', () => {
-        const result = getLocalObject();
+        const result = getLocalObject(localStorage);
         expect(result).toBe(localStorage);
     });
 });

@@ -27,7 +27,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
 ): HooksStoreType<Result, Params> | HooksStorePureType<Result, Params> {
     const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
-    const local = getLocalObject(options?.isReactNative ? 'ReactNative' : 'web');
+    const local = getLocalObject(options?.localObject ?? localStorage);
     if (typeof local !== 'undefined' && withLocalStorage !== '') {
         const token = !local.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : local.getItem(withLocalStorage);
         const obj = JSON.parse(token as string);
