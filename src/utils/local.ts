@@ -1,15 +1,17 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {Environment} from './env';
 
 /**
  * 获取本地对象
  *
- * @param env 环境类型，默认为 'web'
- * @returns 返回本地对象，如果环境类型为 'ReactNative'，则返回 AsyncStorage 对象，否则返回 localStorage 对象
+ * @param local 自定义本地存储对象，如果传入null或undefined则使用localStorage
+ * @returns 返回本地对象，如果local不为null或undefined则返回local，否则返回localStorage
  */
-export function getLocalObject(env: Environment = 'web') {
-    if (env === 'ReactNative') {
-        return AsyncStorage;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function getLocalObject(local?: any) {
+    if (local) {
+        return local;
     }
-    return localStorage;
+    if (typeof localStorage !== 'undefined') {
+        return localStorage;
+    }
+    return null;
 }

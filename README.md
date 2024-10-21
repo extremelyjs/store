@@ -158,7 +158,8 @@ const userInfo = useTestObject<string>((value) => value?.id); // 只订阅id的�
 rn环境下，需要加上是rn的标志
 
 ```tsx
-  const num = createMapperHooksStore<number>(0, {withLocalStorage: 'keyName',isReactNative: true}) // keyName为自定义id
+  import { AsyncStorage } from '@react-native-async-storage/async-storage';
+  const num = createMapperHooksStore<number>(0, {withLocalStorage: 'keyName',local: AsyncStorage}) // keyName为自定义id
 ```
 
 #### 异步更新能力
