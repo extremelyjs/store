@@ -51,7 +51,8 @@ type Strategy = 'acceptFirst' | 'acceptLatest' | 'acceptEvery' | 'acceptSequence
 export interface Options {
     withLocalStorage?: string;
     strategy?: Strategy;
-    isReactNative?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    local?: any;
 }
 
 export interface Ref<Result = unknown, Params = unknown> {

@@ -27,9 +27,9 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
 ): HooksStoreType<Result, Params> | HooksStorePureType<Result, Params> {
     const withLocalStorage = options?.withLocalStorage ?? '';
     let curValue = initValue;
-    const local = getLocalObject(options?.isReactNative ? 'ReactNative' : 'web');
-    if (typeof local !== 'undefined' && withLocalStorage !== '') {
-        const token = !local.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : local.getItem(withLocalStorage);
+    const local = getLocalObject(options?.local);
+    if (withLocalStorage !== '' && local != null) {
+        const token = !local?.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : local?.getItem(withLocalStorage);
         const obj = JSON.parse(token as string);
         curValue = getChangeType(obj.type, obj.value) ?? undefined;
     }
@@ -178,12 +178,12 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
                 throw new Error(error);
             }
         }
-        if (typeof local !== 'undefined' && withLocalStorage !== '') {
+        if (withLocalStorage !== '' && local) {
             const obj = {
                 value: typeof ref.value === 'string' ? ref.value : JSON.stringify(ref.value),
                 type: typeof ref.value,
             };
-            local.setItem(`${withLocalStorage}`, JSON.stringify(obj));
+            local?.setItem(`${withLocalStorage}`, JSON.stringify(obj));
         }
         private_emit();
     }
