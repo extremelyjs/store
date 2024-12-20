@@ -1,10 +1,38 @@
+import * as React from 'react';
+import * as reactTestRenderer from 'react-test-renderer';
 import * as api from '..';
-import {mockLoad, mockPromiseArray} from './react.test';
+
 
 type TestObject = Record<string, number>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const connect = () => (Component: any) => {
+    return () => {
+        return <Component />;
+    };
+};
+
+// // eslint-disable-next-line @typescript-eslint/no-explicit-any
+// const connectWith = (key: any, Component: any) => connect(key)(Component);
+
 function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export async function mockLoad() {
+    await new Promise(resolve => setTimeout(resolve, 10));
+    return 1;
+}
+
+export function mockPromiseArray() {
+    // 模拟十个异步任务，返回数字
+    const arr: Array<Promise<number>> = [];
+    for (let i = 0; i < 10; i++) {
+        arr.push(new Promise(resolve => {
+            setTimeout(() => resolve(i), 1000 * i);
+        }));
+    }
+    return arr;
 }
 
 describe('export api', () => {
@@ -99,5 +127,35 @@ describe('export api', () => {
     test('getLoading', async () => {
         const store = api.createMapperHooksStore<number, void>(-1);
         expect(store.getStoreLoading()).toBeFalsy();
+    });
+
+    test('useStoreValue', () => {
+        const User = () => {
+            const store = api.createMapperHooksStore<number, void>(0);
+            const value = store.useStoreValue();
+            return (
+                <div>
+                    {value}
+                </div>
+            );
+
+        };
+        const Component = connect()(React.memo(User));
+        expect(reactTestRenderer.create(<Component />).toJSON()).toMatchSnapshot();
+        expect(reactTestRenderer.create(<Component />).toJSON()).toEqual(<div>{0}</div>);
+    });
+
+    test('useStoreLoading', () => {
+        const User = () => {
+            const store = api.createMapperHooksStore<number, void>(0);
+            const isLoading = store.useStoreLoading();
+            return (
+                <div>
+                    {isLoading}
+                </div>
+            );
+        };
+        const Component = connect()(React.memo(User));
+        expect(reactTestRenderer.create(<Component />).toJSON()).toMatchSnapshot();
     });
 });

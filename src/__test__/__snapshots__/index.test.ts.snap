@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`export api useStoreValue 1`] = `[Function]`;
+
 exports[`react Subscribe to num value 1`] = `[Function]`;
 
 exports[`react getLoading 1`] = `[Function]`;
