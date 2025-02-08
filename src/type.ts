@@ -4,6 +4,13 @@ export type Action<T = unknown, V = unknown> = (...args: T[]) => V;
 
 export type FuncPromise<T = unknown> = (data: T) => Promise<void>;
 
+export interface EffectEvent {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    beforeEvent?: Function;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    afterEvent?: Function;
+}
+
 export interface StoreType<T = unknown> {
     subscribe: (id: symbol, callback: Func) => void;
     dispatch: (action?: unknown) => void;
@@ -24,7 +31,8 @@ export interface HooksStoreType<T = unknown, Params = unknown> {
         // eslint-disable-next-line @typescript-eslint/unified-signatures
         (func: Func<T>): void;
      };
-    loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>) => FuncPromise<Params>;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>, event?: EffectEvent) => FuncPromise<Params>;
     getStoreValue: () => T;
     useStoreLoading: () => boolean;
     getStoreLoading: () => boolean;
@@ -43,7 +51,8 @@ export interface HooksStorePureType<T = unknown, Params = unknown> extends Omit<
         // eslint-disable-next-line @typescript-eslint/unified-signatures
         (func: Func<T>): void;
      };
-    loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>) => FuncPromise<Params>;
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    loadStoreValue: (params: Func<Params, Params>, func: Action<Params, Promise<T>>, event?: EffectEvent) => FuncPromise<Params>;
 }
 
 type Strategy = 'acceptFirst' | 'acceptLatest' | 'acceptEvery' | 'acceptSequenced';

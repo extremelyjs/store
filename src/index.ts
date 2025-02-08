@@ -1,6 +1,6 @@
 import {useMemo} from 'react';
 import {useSyncExternalStore} from 'use-sync-external-store/shim';
-import {Options, Ref, HooksStoreType, Func, Action, Listener, HooksStorePureType} from './type';
+import {Options, Ref, HooksStoreType, Func, Action, Listener, HooksStorePureType, EffectEvent} from './type';
 import {getLocalObject} from './utils/local';
 import {getChangeType} from './utils/getChangeType';
 
@@ -216,25 +216,28 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
      * @param func 函数类型，参数为Result类型，返回值为Promise<Result>类型
      * @returns 返回一个异步函数，参数为Params类型，无返回值
      */
-    function loadStoreValue(params: Func<Params, Params>, func: Action<Params, Promise<Result>>) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    function loadStoreValue(params: Func<Params, Params>, func: Action<Params, Promise<Result>>, event?: EffectEvent) {
         // eslint-disable-next-line no-underscore-dangle
         async function _loadStoreValue(data: Params) {
+            await event?.beforeEvent?.();
             try {
                 queueMicrotask(() => {
                     // 设置loading
                     ref.loading = true;
                 });
-
-                func(params(data)).then(value => {
-                    ref.loading = false;
-                    setStoreValue(value);
-                });
-
+                const value = await func(params(data));
+                ref.loading = false;
+                setStoreValue(value);
             }
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             catch (error: any) {
                 throw new Error(error);
             }
+            finally {
+                ref.loading = false;
+            }
+            await event?.afterEvent?.();
         }
 
         return _loadStoreValue;

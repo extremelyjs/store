@@ -1,5 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`export api after loadStoreValue 1`] = `
+<div>
+  0
+</div>
+`;
+
+exports[`export api after set 1`] = `
+<div>
+  0
+</div>
+`;
+
+exports[`export api after setStoreValue 1`] = `
+<div>
+  18
+</div>
+`;
+
+exports[`export api use selector 1`] = `
+<div>
+  18
+</div>
+`;
+
 exports[`export api useStoreLoading 1`] = `<div />`;
 
 exports[`export api useStoreValue 1`] = `

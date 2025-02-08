@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "./components/Button";
 import { useNum } from "./store/num";
 import { loadTestAsync, useTestAsync } from "./store/testAsync";
@@ -7,6 +7,13 @@ import { loadIndexData, useIndexData, useIndexDataLoading } from "./store/indexD
 import { setStr, useStr } from "./store/str";
 import { setTestArr, useTestArr } from "./store/arr";
 import { setTestObject, useTestObject } from "./store/testObject";
+import { createMapperHooksStore } from "../../src";
+
+interface IUser {
+  age: number;
+  name: string;
+  address: string;
+}
 
 
 function App() {
@@ -59,7 +66,18 @@ function App() {
         name: "lisi"
       }
     ))
-  },[])
+  },[]);
+
+  const store = createMapperHooksStore<IUser, void>({
+    age: 18,
+    name: 'red',
+    address: 'ccc',
+  });
+  const value = store.useStoreValue((value) => value?.age);
+  useEffect(() => {
+      store.setStoreValue(v => ({...v,age: v?.age + 1}));
+  }, [store]);
+
 
   return (
     <div>
@@ -86,6 +104,7 @@ function App() {
       </p>
       {str}
       <button onClick={handleChange}>+xxx</button>
+      {value}
     </div>
   )
 }
