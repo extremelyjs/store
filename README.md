@@ -1,4 +1,5 @@
 # 一种全新的store库
+**思路来自：https://github.com/regionjs/region-core**
 
 **之前叫@apiknight/store，现已更名**
 
