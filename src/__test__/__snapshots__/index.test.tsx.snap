@@ -14,7 +14,7 @@ exports[`export api after set 1`] = `
 
 exports[`export api after setStoreValue 1`] = `
 <div>
-  18
+  19
 </div>
 `;
 

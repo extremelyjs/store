@@ -224,38 +224,40 @@ describe('export api', () => {
         expect(render.toJSON()).toEqual({type: 'div', props: {}, children: ['18']});
     });
 
-    // test('after setStoreValue', async () => {
-    //     interface IUser {
-    //         age: number;
-    //         name: string;
-    //         address: string;
-    //     }
-    //     const User = () => {
-    //         const store = api.createMapperHooksStore<IUser, void>({
-    //             age: 18,
-    //             name: 'red',
-    //             address: 'ccc',
-    //         });
-    //         const value = store.useStoreValue(value => value?.age);
-    //         React.useEffect(
-    //             () => {
-    //                 store.setStoreValue(v => ({...v, age: v?.age + 1}));
-    //             },
-    //             [store]
-    //         );
-    //         return (
-    //             <div>
-    //                 {value}
-    //             </div>
-    //         );
+    test('after setStoreValue', async () => {
+        interface IUser {
+            age: number;
+            name: string;
+            address: string;
+        }
+        const store = api.createMapperHooksStore<IUser, void>({
+            age: 18,
+            name: 'red',
+            address: 'ccc',
+        });
+        const useStoreValue = store.useStoreValue;
+        const setStoreValue = store.setStoreValue;
+        const User = () => {
+            const value = useStoreValue(value => value?.age);
+            React.useEffect(
+                () => {
+                    setStoreValue(v => ({...v, age: v?.age + 1}));
+                },
+                []
+            );
+            return (
+                <div>
+                    {value}
+                </div>
+            );
 
-    //     };
-    //     const Component = connect()(React.memo(User));
-    //     const render = reactTestRenderer.create(<Component />);
-    //     await delay(2000);
-    //     expect(render.toJSON()).toMatchSnapshot();
-    //     expect(render.toJSON()).toEqual({type: 'div', props: {}, children: ['19']});
-    // });
+        };
+        const Component = connect()(React.memo(User));
+        const render = reactTestRenderer.create(<Component />);
+        await delay(2000);
+        expect(render.toJSON()).toMatchSnapshot();
+        expect(render.toJSON()).toEqual({type: 'div', props: {}, children: ['19']});
+    });
 
     test('useStoreLoading', () => {
         const User = () => {
