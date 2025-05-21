@@ -151,4 +151,32 @@ describe('react', () => {
         expect(Component).toMatchSnapshot();
     });
 
+    // 测试 setNum 在加载状态下的行为
+    test('setNum during loading throws error', async () => {
+        function delay(time: number) {
+            return new Promise(resolve => setTimeout(resolve, time));
+        }
+        loadNum();
+        await delay(0); // 等待 queueMicrotask 执行
+        expect(() => setNum(1)).toThrow('当前处于加载状态，请等待加载完成。');
+    });
+
+    // 测试本地存储功能
+    test('withLocalStorage', () => {
+        const key = 'test_key';
+        const store = api.createMapperHooksStore<number, void>(0, {withLocalStorage: key});
+        store.setStoreValue(1);
+        const storedValue = JSON.parse(localStorage.getItem(key) || '{}');
+        expect(storedValue.value).toBe('1');
+        expect(storedValue.type).toBe('number');
+    });
+
+    // 测试边界条件：空值
+    test('handle undefined value', () => {
+        const store = api.createMapperHooksStore<number, void>();
+        expect(store.getStoreValue()).toBeUndefined();
+        store.setStoreValue(undefined);
+        expect(store.getStoreValue()).toBeUndefined();
+    });
+
 });

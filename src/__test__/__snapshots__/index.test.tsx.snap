@@ -31,3 +31,9 @@ exports[`export api useStoreValue 1`] = `
   0
 </div>
 `;
+
+exports[`export api useStoreValue handles selector error 1`] = `
+<div>
+  0
+</div>
+`;

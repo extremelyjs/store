@@ -30,8 +30,12 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
     const local = getLocalObject(options?.local);
     if (withLocalStorage !== '' && local != null) {
         const token = !local?.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : local?.getItem(withLocalStorage);
-        const obj = JSON.parse(token as string);
-        curValue = getChangeType(obj.type, obj.value) ?? undefined;
+        try {
+            const obj = JSON.parse(token as string);
+            curValue = getChangeType(obj.type, obj.value) ?? undefined;
+        } catch {
+            curValue = initValue as Result;
+        }
     }
     const ref: Ref<Result, Params> = {
         // loading后续可以自定义
@@ -274,12 +278,15 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
         }
 
         else {
-            promiseQueue.forEach((item, index) => {
-                item.then(value => {
+            // 修复 acceptSequenced 策略实现
+            for (const promise of promiseQueue) {
+                try {
+                    const value = await promise;
                     setStoreValue(value);
-                });
-                promiseQueue.slice(index + 1);
-            });
+                } catch (error) {
+                    throw error;
+                }
+            }
         }
     }
 
