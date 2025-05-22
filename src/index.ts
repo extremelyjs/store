@@ -2,7 +2,7 @@ import {useMemo} from 'react';
 import {useSyncExternalStore} from 'use-sync-external-store/shim';
 import {Options, Ref, HooksStoreType, Func, Action, Listener, HooksStorePureType, EffectEvent} from './type';
 import {getLocalObject} from './utils/local';
-import {getChangeType} from './utils/getChangeType';
+import {getChangeValue} from './utils/getChangeValue';
 
 
 /**
@@ -32,7 +32,7 @@ export function createMapperHooksStore<Result = unknown, Params = unknown>(
         const token = !local?.getItem(withLocalStorage) ? '{"value": "","type": "other"}' : local?.getItem(withLocalStorage);
         try {
             const obj = JSON.parse(token as string);
-            curValue = getChangeType(obj.type, obj.value) ?? undefined;
+            curValue = getChangeValue(obj.type, obj.value) ?? undefined;
         } catch {
             curValue = initValue as Result;
         }

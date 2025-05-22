@@ -23,7 +23,7 @@ export function getBooleanValue(value: 'true' | 'false') {
  * @returns 返回转换后的值
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getChangeType = (currentType: string | undefined, value: any) => {
+export const getChangeValue = (currentType: string | undefined, value: any) => {
     switch (currentType) {
         case 'string':
             return String(value);

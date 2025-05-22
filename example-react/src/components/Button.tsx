@@ -1,16 +1,25 @@
-import { useCallback } from "react";
-import { resetNum, setNum } from "../store/num";
+import {useCallback} from 'react';
+import {resetNum, setNum} from '../store/num';
 
 function Button() {
-    const handleAdd = useCallback(() => {
-        setNum(num => num + 10);
-    }, [])
-    const handleSetValue = useCallback(() => {
-        setNum(1);
-    }, [])
-    const handleReset = useCallback(() => {
-        resetNum();
-    }, [])
+    const handleAdd = useCallback(
+        () => {
+            setNum(num => num + 10);
+        },
+        []
+    );
+    const handleSetValue = useCallback(
+        () => {
+            setNum(1);
+        },
+        []
+    );
+    const handleReset = useCallback(
+        () => {
+            resetNum();
+        },
+        []
+    );
     return (
         <>
             <button onClick={handleAdd}>
@@ -23,7 +32,7 @@ function Button() {
                 按钮(重置num)
             </button>
         </>
-    )
+    );
 }
 
 export default Button;

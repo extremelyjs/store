@@ -1,4 +1,4 @@
-import { createMapperHooksStore } from "@extremelyjs/store/src/index";
+import {createMapperHooksStore} from '@extremelyjs/store/src/index';
 
 interface MyInfo {
     id: string;
@@ -9,10 +9,10 @@ interface MyInfo {
 
 const testObjectStore = createMapperHooksStore<MyInfo>({
     id: '1',
-    name: "zhangsan",
+    name: 'zhangsan',
     age: 18,
-    address: "beijing"
-  });
+    address: 'beijing',
+});
 
 export const useTestObject = testObjectStore.useStoreValue;
 export const setTestObject = testObjectStore.setStoreValue;

@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useState } from "react";
-import Button from "./components/Button";
-import { useNum } from "./store/num";
-import { loadTestAsync, useTestAsync } from "./store/testAsync";
-import { mockPromiseArray } from "./mock/mockPromiseArray";
-import {
-  loadIndexData,
-  useIndexData,
-  useIndexDataLoading,
-} from "./store/indexData";
-import { setStr, useStr } from "./store/str";
-import { setTestArr, useTestArr } from "./store/arr";
-import { setTestObject, useTestObject } from "./store/testObject";
-import { createMapperHooksStore } from "../../src";
+import {useCallback, useEffect, useState} from 'react';
+import {createMapperHooksStore} from '../../src';
 import * as api from '../../src';
+import Button from './components/Button';
+import {useNum} from './store/num';
+import {loadTestAsync, useTestAsync} from './store/testAsync';
+import {mockPromiseArray} from './mock/mockPromiseArray';
+import {
+    loadIndexData,
+    useIndexData,
+    useIndexDataLoading,
+} from './store/indexData';
+import {setStr, useStr} from './store/str';
+import {setTestArr, useTestArr} from './store/arr';
+import {setTestObject, useTestObject} from './store/testObject';
 
 interface IUser {
   age: number;
@@ -133,24 +133,30 @@ interface IUser {
 // }
 
 function App() {
-  const store = api.createMapperHooksStore<IUser, void>({
-    age: 18,
-    name: "red",
-    address: "ccc",
-  });
-  const value = store.useStoreValue((value) => value?.age);
-  useEffect(() => {
-    store.setStoreValue((v) => ({ ...v, age: v.age + 1 }));
-  }, [store]);
-  const handleClick = useCallback(() => {
-    store.setStoreValue((v) => ({ ...v, age: v.age + 1 }));
-  },[store])
-  return (
-    <div>
-      <div>{value}</div>
-      <button onClick={handleClick}>点击</button>
-    </div>
-  );
+    const store = api.createMapperHooksStore<IUser, void>({
+        age: 18,
+        name: 'red',
+        address: 'ccc',
+    });
+    const value = store.useStoreValue(value => value?.age);
+    useEffect(
+        () => {
+            store.setStoreValue(v => ({...v, age: v.age + 1}));
+        },
+        [store]
+    );
+    const handleClick = useCallback(
+        () => {
+            store.setStoreValue(v => ({...v, age: v.age + 1}));
+        },
+        [store]
+    );
+    return (
+        <div>
+            <div>{value}</div>
+            <button onClick={handleClick}>点击</button>
+        </div>
+    );
 }
 
 export default App;

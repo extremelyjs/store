@@ -1,6 +1,6 @@
-import { createMapperHooksStore } from "@extremelyjs/store/src/index";
+import {createMapperHooksStore} from '@extremelyjs/store/src/index';
 
-const strStore = createMapperHooksStore<string>('',{withLocalStorage: 'str-test'});
+const strStore = createMapperHooksStore<string>('', {withLocalStorage: 'str-test'});
 
 export const useStr = strStore.useStoreValue;
 

@@ -1,9 +1,9 @@
-import { createMapperHooksStore } from "@extremelyjs/store/src/index";
-import { getIndex } from "../api";
+import {createMapperHooksStore} from '@extremelyjs/store/src/index';
+import {getIndex} from '../api';
 
-const indexDataStore = createMapperHooksStore<Record<string,string>,string>(
-    {value: ""},
-    {withLocalStorage: "index"}
+const indexDataStore = createMapperHooksStore<Record<string, string>, string>(
+    {value: ''},
+    {withLocalStorage: 'index'}
 );
 
 export const useIndexData = indexDataStore.useStoreValue;

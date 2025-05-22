@@ -1,6 +1,6 @@
-import {getBooleanValue} from '../getChangeType';
+import {getBooleanValue} from '../getChangeValue';
 
-describe('getChangeType', () => {
+describe('getChangeValue', () => {
     test('getBooleanValue should return true when input is "true"', () => {
         expect(getBooleanValue('true')).toBe(true);
     });
